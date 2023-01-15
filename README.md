@@ -8,9 +8,9 @@ Include Swagger Documentation API with JWT authentication.
 
 # How to install & start
 
-### `git clone` https://github.com/marcosbustamantemateo/GenericAPIController
+### 1. `git clone` https://github.com/marcosbustamantemateo/GenericAPIController
 
-Modify appsettings.json and update it with your SQL Server connection:
+2. Modify appsettings.json and update it with your SQL Server connection:
 
 ```json class:"lineNo"
 {
@@ -35,7 +35,7 @@ Modify appsettings.json and update it with your SQL Server connection:
 
 Then
 
-In the project directory execute it with nuget console to create the database:
+3. In the project directory execute it with nuget console to create the database:
 
 ### `update-database`
 
