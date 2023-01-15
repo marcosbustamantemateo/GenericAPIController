@@ -6,12 +6,45 @@ This is for you! The perfect solution for starting .NET Core API Projects. <br>
 Provides and generates API controllers and business logic CRUD methods for any object you want with the GeneratedController annotation.
 Include Swagger Documentation API with JWT authentication.
 
+# How to install & start
+
+### `git clone` https://github.com/marcosbustamantemateo/GenericAPIController
+
+Modify appsettings.json and update it with your SQL Server connection:
+
+```json class:"lineNo"
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "PRE_EntitiesConnection": "Data Source=localhost\\SQLEXPRESS;Database=PRE_GENERIC;user=sa;password=B18822189b*;MultipleActiveResultSets=true",
+    "EntitiesConnection": "Data Source=localhost\\SQLEXPRESS;Database=GENERIC;user=sa;password=B18822189b*;MultipleActiveResultSets=true"
+  },
+  "JWT": {
+    "ValidAudience": "http://localhost:81",
+    "ValidIssuer": "http://localhost:81",
+    "Secret": "TokenGenericControllerLib"
+  },
+  "AllowedHosts": "*"
+}
+```
+
+Then
+
+In the project directory execute it with nuget console to create the database:
+
+### `update-database`
+
 # Documentation
 
 - Generic Controller Base:
 
   ```cs class:"lineNo"
-  /// <summary>
+    /// <summary>
     ///     Controlador base que proporciona métodos CRUD para cualquier tipo de objeto
     /// </summary>
     /// <typeparam name="T">Entidad tipo T</typeparam>
