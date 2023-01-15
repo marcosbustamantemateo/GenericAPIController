@@ -8,7 +8,9 @@ Include Swagger Documentation API with JWT authentication.
 
 # How to install & start
 
-### 1. `git clone` https://github.com/marcosbustamantemateo/GenericAPIController
+1. Get the code:
+
+### `git clone` https://github.com/marcosbustamantemateo/GenericAPIController
 
 2. Modify appsettings.json and update it with your SQL Server connection:
 
