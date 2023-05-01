@@ -6,12 +6,12 @@ This is for you! The perfect solution for starting .NET Core API Projects. <br>
 Provides and generates API controllers and business logic CRUD methods for any object you want with the GeneratedController annotation.<br>
 
 These methods will be available in the generated API controllers:
--Create
--Read
--Update
--Delete
--Recover
--ReadByKey
+- Create
+- Read
+- Update
+- Delete
+- Recover
+- ReadByKey
 
 Include Swagger Documentation API with JWT authentication.<br>
 
