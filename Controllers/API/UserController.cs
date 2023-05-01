@@ -3,6 +3,7 @@ using GenericControllerLib.Dto;
 using GenericControllerLib.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic.Core;
 
 namespace GenericControllerLib.Controllers.API
@@ -21,23 +22,25 @@ namespace GenericControllerLib.Controllers.API
             _usuarioBL= usuarioBL;
         }
 
-        /// <summary>
-        ///     Devuelve un listado de entidad dada
-        /// </summary>
-        /// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
-        /// <param name="pageSize">Nº de resltados a mostrar por página</param>
-        /// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
-        /// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
-        /// <returns>Listado de entidad dada</returns>
-        [Authorize]
+		/// <summary>
+		///     Devuelve un listado de entidad dada
+		/// </summary>
+		/// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
+		/// <param name="pageSize">Nº de resltados a mostrar por página</param>
+		/// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
+		/// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
+		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
+		/// <returns>Listado de entidad dada</returns>
+		[Authorize]
         [HttpGet("Read")]
-        public async Task<ActionResult> Read(int page = 1, int pageSize = 10, string filter = "", bool includeDeleted = true)
+        public async Task<ActionResult> Read(int page = 1, int pageSize = 10, string filter = "",
+			                                    [Required] bool includeDeleted = true, [Required] bool excludeActived = false)
         {
             try
             {
                 if (page >= 1 || pageSize >= 1)
                 {
-                    var result = _usuarioBL.Read(page, pageSize, filter, includeDeleted);
+                    var result = _usuarioBL.Read(page, pageSize, filter, includeDeleted, excludeActived);
                     var pagedResultAux = (PagedResult<User>?)result.data;
 
                     return Ok(new BaseDto($"Objeto tipo: {typeof(User)}" +

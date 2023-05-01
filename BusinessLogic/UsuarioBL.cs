@@ -26,11 +26,11 @@ namespace GenericControllerLib.BusinessLogic
             _signInManager = signInManager;
         }
 
-        public override ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted)
+        public override ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted, bool excludeActived)
         {
             try
             {
-                var result = base.Read(page, pageSize, filter, includeDeleted);
+                var result = base.Read(page, pageSize, filter, includeDeleted, excludeActived);
                 var users = (PagedResult<User>?) result.data;
                 foreach (var user in users.Queryable)
                 {

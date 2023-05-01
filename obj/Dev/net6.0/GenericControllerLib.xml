@@ -6,45 +6,53 @@
     <members>
         <member name="T:GenericControllerLib.BusinessLogic.BusinessLogic`1">
             <summary>
-            Clase que provee los métodos de la lógica de negocio común para cualquier entidad
+                Clase que provee los métodos de la lógica de negocio común para cualquier entidad
             </summary>
             <typeparam name="T">Entidad a usar</typeparam>
         </member>
         <member name="M:GenericControllerLib.BusinessLogic.BusinessLogic`1.Create(`0)">
             <summary>
-            Crea un registro en base de datos del tipo T
+                Crea un registro en base de datos del tipo T
             </summary>
             <param name="entity">Entidad del tipo T a crear</param>
             <returns>Resultado de la operación</returns>
         </member>
-        <member name="M:GenericControllerLib.BusinessLogic.BusinessLogic`1.Read(System.Int32,System.Int32,System.String,System.Boolean)">
+        <member name="M:GenericControllerLib.BusinessLogic.BusinessLogic`1.Read(System.Int32,System.Int32,System.String,System.Boolean,System.Boolean)">
             <summary>
-            Devuelve un listado de registros de base de datos del tipo T
+                Devuelve un listado de registros de base de datos del tipo T
             </summary>
             <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
             <param name="pageSize">Nº de resltados a mostrar por página</param>
             <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
             <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
+            <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
             <returns>Listado de tipo T</returns>
         </member>
         <member name="M:GenericControllerLib.BusinessLogic.BusinessLogic`1.Update(`0)">
             <summary>
-            Actualiza en base de datos un registro del tipo T
+                Actualiza en base de datos un registro del tipo T
             </summary>
             <param name="entity">Entidad del tipo T a actalizar</param>
             <returns></returns>
         </member>
         <member name="M:GenericControllerLib.BusinessLogic.BusinessLogic`1.Delete(System.Int32,System.Boolean)">
             <summary>
-            Elimina o da de baja un registro del tipo T en base de datos dado su Id
+                Elimina o da de baja un registro del tipo T en base de datos dado su Id
             </summary>
             <param name="id">Id del objeto del tipo T a buscar</param>
             <param name="saveData">Indica si en lugar de borrar el objeto solo da de baja el objeto</param>
             <returns>Resultado de la operación</returns>
         </member>
+        <member name="M:GenericControllerLib.BusinessLogic.BusinessLogic`1.Recover(System.Int32)">
+            <summary>
+                Da de alta un registro del tipo T en base de datos dado su Id
+            </summary>
+            <param name="id">Id del objeto del tipo T a buscar</param>
+            <returns>Resultado de la operación</returns>
+        </member>
         <member name="M:GenericControllerLib.BusinessLogic.BusinessLogic`1.GetByKey(System.String,System.Object)">
             <summary>
-            Devuelve un registro del tipo T en base de datos dado su clave y valor dados
+                Devuelve un registro del tipo T en base de datos dado su clave y valor dados
             </summary>
             <param name="key">Clave del objeto del tipo T a buscar</param>
             <param name="value">Valor del objeto del tipo T a buscar</param>
@@ -127,7 +135,7 @@
             <param name="entity">Objeto a crear</param>
             <returns>Resultado de la operación</returns>
         </member>
-        <member name="M:GenericControllerLib.Controllers.API.BaseAPIController`1.Read(System.Int32,System.Int32,System.String,System.Boolean)">
+        <member name="M:GenericControllerLib.Controllers.API.BaseAPIController`1.Read(System.Int32,System.Int32,System.String,System.Boolean,System.Boolean)">
             <summary>
                 Devuelve un listado de entidad dada
             </summary>
@@ -135,6 +143,7 @@
             <param name="pageSize">Nº de resltados a mostrar por página</param>
             <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
             <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
+            <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
             <returns>Listado de entidad dada</returns>
         </member>
         <member name="M:GenericControllerLib.Controllers.API.BaseAPIController`1.Update(`0)">
@@ -146,10 +155,17 @@
         </member>
         <member name="M:GenericControllerLib.Controllers.API.BaseAPIController`1.Delete(System.Int32,System.Boolean)">
             <summary>
-                Da de baja una entidad dado su ids
+                Da de baja una entidad dado su id
             </summary>
             <param name="id">Id de la entidad</param>
             <param name="saveData">Indica si en lugar de borrar el objeto solo da de baja el objeto</param>
+            <returns>Resultado de la operación</returns>
+        </member>
+        <member name="M:GenericControllerLib.Controllers.API.BaseAPIController`1.Recover(System.Int32)">
+            <summary>
+                Da de alta una entidad dado su id
+            </summary>
+            <param name="id">Id de la entidad</param>
             <returns>Resultado de la operación</returns>
         </member>
         <member name="M:GenericControllerLib.Controllers.API.BaseAPIController`1.ReadByKey(System.String,System.String)">
@@ -160,7 +176,7 @@
             <param name="value">Valor de la propiedad a filtrar</param>
             <returns>Entidad dada</returns>
         </member>
-        <member name="M:GenericControllerLib.Controllers.API.UserController.Read(System.Int32,System.Int32,System.String,System.Boolean)">
+        <member name="M:GenericControllerLib.Controllers.API.UserController.Read(System.Int32,System.Int32,System.String,System.Boolean,System.Boolean)">
             <summary>
                 Devuelve un listado de entidad dada
             </summary>
@@ -168,6 +184,7 @@
             <param name="pageSize">Nº de resltados a mostrar por página</param>
             <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
             <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
+            <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
             <returns>Listado de entidad dada</returns>
         </member>
         <member name="M:GenericControllerLib.Controllers.API.UserController.Login(GenericControllerLib.Dto.InputLogin)">

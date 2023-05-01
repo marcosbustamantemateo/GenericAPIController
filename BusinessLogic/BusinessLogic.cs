@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,7 +11,7 @@ namespace GenericControllerLib.BusinessLogic
     public record struct ObjectBL(object? data, int rowsAffected);
 
     /// <summary>
-    /// Clase que provee los métodos de la lógica de negocio común para cualquier entidad
+    ///     Clase que provee los métodos de la lógica de negocio común para cualquier entidad
     /// </summary>
     /// <typeparam name="T">Entidad a usar</typeparam>
     public class BusinessLogic<T> where T : class
@@ -23,7 +25,7 @@ namespace GenericControllerLib.BusinessLogic
         }
 
         /// <summary>
-        /// Crea un registro en base de datos del tipo T
+        ///     Crea un registro en base de datos del tipo T
         /// </summary>
         /// <param name="entity">Entidad del tipo T a crear</param>
         /// <returns>Resultado de la operación</returns>
@@ -41,19 +43,26 @@ namespace GenericControllerLib.BusinessLogic
             }
         }
 
-        /// <summary>
-        /// Devuelve un listado de registros de base de datos del tipo T
-        /// </summary>
-        /// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
-        /// <param name="pageSize">Nº de resltados a mostrar por página</param>
-        /// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
-        /// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
-        /// <returns>Listado de tipo T</returns>
-        public virtual ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted)
+		/// <summary>
+		///     Devuelve un listado de registros de base de datos del tipo T
+		/// </summary>
+		/// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
+		/// <param name="pageSize">Nº de resltados a mostrar por página</param>
+		/// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
+		/// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
+		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
+		/// <returns>Listado de tipo T</returns>
+		public virtual ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted, bool excludeActived)
         {
             try
             {
-                var expression = !includeDeleted ? GetFilterExpression(new Dictionary<string, object> { ["deletedDate"] = null }) : null;
+                var expression = !includeDeleted 
+                    ? GetFilterExpression(new Dictionary<string, object> { ["deletedDate"] = null }) 
+                    : null;
+                if (excludeActived)
+					expression = includeDeleted
+					    ? GetFilterExpression(new Dictionary<string, object> { ["!deletedDate"] = null })
+					    : throw new Exception("No se pueden excluir los objetos activos si no se incluyen los dados de baja");
                 var result = Get(expression, page, pageSize, filter);
                 return new ObjectBL(result, result.Queryable.Count());
             }
@@ -64,7 +73,7 @@ namespace GenericControllerLib.BusinessLogic
         }
 
         /// <summary>
-        /// Actualiza en base de datos un registro del tipo T
+        ///     Actualiza en base de datos un registro del tipo T
         /// </summary>
         /// <param name="entity">Entidad del tipo T a actalizar</param>
         /// <returns></returns>
@@ -83,7 +92,7 @@ namespace GenericControllerLib.BusinessLogic
         }
 
         /// <summary>
-        /// Elimina o da de baja un registro del tipo T en base de datos dado su Id
+        ///     Elimina o da de baja un registro del tipo T en base de datos dado su Id
         /// </summary>
         /// <param name="id">Id del objeto del tipo T a buscar</param>
         /// <param name="saveData">Indica si en lugar de borrar el objeto solo da de baja el objeto</param>
@@ -112,13 +121,34 @@ namespace GenericControllerLib.BusinessLogic
             }
         }
 
-        /// <summary>
-        /// Devuelve un registro del tipo T en base de datos dado su clave y valor dados
-        /// </summary>
-        /// <param name="key">Clave del objeto del tipo T a buscar</param>
-        /// <param name="value">Valor del objeto del tipo T a buscar</param>
-        /// <returns>Objeto del tipo T por su Código</returns>
-        public ObjectBL GetByKey(string key, object value)
+		/// <summary>
+		///     Da de alta un registro del tipo T en base de datos dado su Id
+		/// </summary>
+		/// <param name="id">Id del objeto del tipo T a buscar</param>
+		/// <returns>Resultado de la operación</returns>
+		public virtual ObjectBL Recover(int id)
+		{
+			try
+			{
+				var entity = GetByKey("id", id);
+				SetProperty(entity, "data.DeletedDate", null);
+				var result = _entitiesDbContext.Update(entity.data).Entity;
+				int rowsAffected = _entitiesDbContext.SaveChanges();
+				return new ObjectBL(result, rowsAffected);
+			}
+			catch
+			{
+				throw;
+			}
+		}
+
+		/// <summary>
+		///     Devuelve un registro del tipo T en base de datos dado su clave y valor dados
+		/// </summary>
+		/// <param name="key">Clave del objeto del tipo T a buscar</param>
+		/// <param name="value">Valor del objeto del tipo T a buscar</param>
+		/// <returns>Objeto del tipo T por su Código</returns>
+		public ObjectBL GetByKey(string key, object value)
         {
             try
             {
@@ -184,11 +214,22 @@ namespace GenericControllerLib.BusinessLogic
 
                 if (properties2Values.Count == 1)
                 {
-                    Expression nameProperty = Expression.Property(argParam, properties2Values.ElementAt(0).Key);
-                    ConstantExpression constantExpression = Expression.Constant(properties2Values.ElementAt(0).Value);
-                    Expression expression = Expression.Equal(nameProperty, constantExpression);
+                    if (properties2Values.ElementAt(0).Key.Contains("!"))
+                    {
+						Expression nameProperty = Expression.Property(argParam, properties2Values.ElementAt(0).Key.Replace("!", ""));
+						ConstantExpression constantExpression = Expression.Constant(properties2Values.ElementAt(0).Value);
+						Expression expression = Expression.NotEqual(nameProperty, constantExpression);
 
-                    return Expression.Lambda<Func<T, bool>>(expression, argParam);
+						return Expression.Lambda<Func<T, bool>>(expression, argParam);
+					}
+                    else
+                    {
+                        Expression nameProperty = Expression.Property(argParam, properties2Values.ElementAt(0).Key);
+                        ConstantExpression constantExpression = Expression.Constant(properties2Values.ElementAt(0).Value);
+                        Expression expression = Expression.Equal(nameProperty, constantExpression);
+
+                        return Expression.Lambda<Func<T, bool>>(expression, argParam);
+                    }
                 }
                 // TO DO: No está bien hecho para cuando hay más de un parámetro
                 else if (properties2Values.Count > 1)
@@ -288,7 +329,7 @@ namespace GenericControllerLib.BusinessLogic
                         var contains = Expression.Call(propertyAccess, containsMethod, filterConstant);
                         // var equal = Expression.Equal(propertyAccess, filterConstant);
                         conditions.Add(contains);
-                    }
+                    } 
                 }
 
                 // Se agrupa las expresiones en una expresión "conditions[0] || conditions[1] || conditions[2] || ... || conditions[n]"
