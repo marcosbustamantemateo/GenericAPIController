@@ -14,9 +14,18 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Contexts
+#if DEV
 builder.Services
-    .AddDbContext<EntitiesDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("EntitiesConnection")));
-
+    .AddDbContext<EntitiesDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DEV_EntitiesConnection")));
+#endif
+#if PRE
+builder.Services
+    .AddDbContext<EntitiesDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PRE_EntitiesConnection")));
+#endif
+#if PROD
+builder.Services
+    .AddDbContext<EntitiesDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PROD_EntitiesConnection")));
+#endif
 // Identity
 builder.Services
     .AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
