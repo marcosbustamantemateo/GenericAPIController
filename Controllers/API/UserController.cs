@@ -114,9 +114,9 @@ namespace GenericControllerLib.Controllers.API
 		/// <param name="idRol">Id del rol</param>
 #if PROD
 		[Authorize(Roles = "Superadmin")]
+		[ProducesResponseType(typeof(BaseDto), 401)]
 #endif
 		[HttpPost("AssignRole")]
-		[ProducesResponseType(typeof(BaseDto), 401)]
 		public IActionResult AssignRole(int idUsuario, int idRol)
 		{
 			try

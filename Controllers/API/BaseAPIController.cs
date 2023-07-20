@@ -3,6 +3,7 @@ using GenericControllerLib.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Dynamic;
 using System.Linq.Dynamic.Core;
 
 namespace GenericControllerLib.Controllers.API
@@ -13,12 +14,12 @@ namespace GenericControllerLib.Controllers.API
 	/// <typeparam name="T">Entidad tipo T</typeparam>
 #if PROD
 	[Authorize]
+	[ProducesResponseType(typeof(BaseDto), 401)]
 #endif
 	[Route("api/[controller]")]
 	[ApiController]
 	[ProducesResponseType(typeof(BaseDto), 200)]
 	[ProducesResponseType(typeof(BaseDto), 400)]
-	[ProducesResponseType(typeof(BaseDto), 401)]
 	[ProducesResponseType(typeof(BaseDto), 500)]
 	public class BaseAPIController<T> : ControllerBase where T : class
 	{
@@ -27,6 +28,14 @@ namespace GenericControllerLib.Controllers.API
 		public BaseAPIController(BusinessLogic<T> businessLogic)
 		{
 			_businessLogic = businessLogic;
+		}
+
+		[HttpPost("Test")]
+		public IActionResult Test(List<FieldDto> fieldDtos)
+		{
+
+			dynamic example = new ExpandoObject();
+			return Ok();
 		}
 
 		/// <summary>
