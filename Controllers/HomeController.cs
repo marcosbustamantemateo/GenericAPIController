@@ -2,11 +2,17 @@
 
 namespace GenericControllerLib.Controllers
 {
+    /// <summary>
+    ///     Primer controlador en cargar
+    /// </summary>
     public class HomeController : Controller
     {
         public HomeController() { }
 
-        public async Task<IActionResult> Index()
+        /// <summary>
+        ///     Método principal
+        /// </summary>
+        public IActionResult Index()
         {
             try
             {

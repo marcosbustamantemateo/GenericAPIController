@@ -10,7 +10,10 @@ using System.Text;
 
 namespace GenericControllerLib.BusinessLogic
 {
-    public class UserBL : BusinessLogic<User>
+	/// <summary>
+	///     Clase que provee los métodos de la lógica de negocio específica para la clase User
+	/// </summary>
+	public class UserBL : BusinessLogic<User>
     {
         private readonly EntitiesDbContext _entitiesDbContext;
         private readonly UserManager<User> _userManager;
@@ -26,11 +29,21 @@ namespace GenericControllerLib.BusinessLogic
             _signInManager = signInManager;
         }
 
-        public override ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted, bool excludeActived)
+		/// <summary>
+		///     Devuelve un listado de registros de base de datos del tipo User
+		/// </summary>
+		/// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
+		/// <param name="pageSize">Nº de resltados a mostrar por página</param>
+		/// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
+		/// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
+		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
+		/// <param name="includes">Incluye las propiedas de la entidad seguidas por comas</param>
+		/// <returns>Listado de tipo User</returns>
+		public override ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted, bool excludeActived, string includes)
         {
             try
             {
-                var result = base.Read(page, pageSize, filter, includeDeleted, excludeActived);
+                var result = base.Read(page, pageSize, filter, includeDeleted, excludeActived, includes);
                 var users = (PagedResult<User>?) result.data;
                 foreach (var user in users.Queryable)
                 {
@@ -38,6 +51,7 @@ namespace GenericControllerLib.BusinessLogic
                         .Where(i => i.UserId == user.Id)
                         .Select(i => i.RoleId)
                         .ToList();
+
                     var roles = _entitiesDbContext.Roles
                         .Where(i => usersRoles.Contains(i.Id))
                         .Select(i => i.Name)
@@ -54,7 +68,7 @@ namespace GenericControllerLib.BusinessLogic
         }
 
         /// <summary>
-        /// Permite al usuario con su contraseña ingresar al sistema si esta es correcta
+        ///     Permite al usuario con su contraseña ingresar al sistema si esta es correcta
         /// </summary>
         /// <param name="inputLogin">Modelo de usuario y contraseña</param>
         /// <returns>
@@ -152,6 +166,11 @@ namespace GenericControllerLib.BusinessLogic
 
         #region Private methods
 
+        /// <summary>
+        ///     Crea el token a partir de los parámetros de autenticación
+        /// </summary>
+        /// <param name="authClaims">Listado de permisos de autenticación</param>
+        /// <returns></returns>
         private JwtSecurityToken GetToken(List<Claim> authClaims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));

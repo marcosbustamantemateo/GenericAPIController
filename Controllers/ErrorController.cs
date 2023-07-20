@@ -2,9 +2,16 @@
 
 namespace GenericControllerLib.Controllers
 {
+    /// <summary>
+    ///     Captura
+    /// </summary>
     public class ErrorController : Controller
     {
-        public IActionResult Http(int statusCode)
+		/// <summary>
+		///     Maneja los errores según su código y devuelve sus respectivas vistas 
+		/// </summary>
+		/// <param name="statusCode">Código de estado del error</param>
+		public IActionResult Http(int statusCode)
         {
             if (statusCode == 401 || statusCode == 403)
                 return StatusCode(401, "¡Error: Usuario no autenticado u autorizado!");

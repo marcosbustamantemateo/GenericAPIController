@@ -1,14 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
-using System.Linq.Dynamic.Core;
+﻿using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace GenericControllerLib.BusinessLogic
 {
-    public record struct ObjectBL(object? data, int rowsAffected);
+	public record struct ObjectBL(object? data, int rowsAffected);
 
     /// <summary>
     ///     Clase que provee los métodos de la lógica de negocio común para cualquier entidad
@@ -48,14 +44,19 @@ namespace GenericControllerLib.BusinessLogic
 		/// </summary>
 		/// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
 		/// <param name="pageSize">Nº de resltados a mostrar por página</param>
-		/// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
+		/// <param name="filter">Filtra por todas y cada una de las propiedas de la entidad</param>
 		/// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
 		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
+		/// <param name="includes">Incluye las propiedas de la entidad seguidas por comas</param>
 		/// <returns>Listado de tipo T</returns>
-		public virtual ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted, bool excludeActived)
+		public virtual ObjectBL Read(int page, int pageSize, string filter, bool includeDeleted, bool excludeActived, string includes)
         {
             try
             {
+                var includesAux = includes.Split(",").ToList();
+                includesAux.ForEach(i => i.Trim());
+				includesAux = string.IsNullOrEmpty(includes) || string.IsNullOrEmpty(includesAux[0]) ? null : includesAux;
+
                 var expression = !includeDeleted 
                     ? GetFilterExpression(new Dictionary<string, object> { ["deletedDate"] = null }) 
                     : null;
@@ -63,7 +64,7 @@ namespace GenericControllerLib.BusinessLogic
 					expression = includeDeleted
 					    ? GetFilterExpression(new Dictionary<string, object> { ["!deletedDate"] = null })
 					    : throw new Exception("No se pueden excluir los objetos activos si no se incluyen los dados de baja");
-                var result = Get(expression, page, pageSize, filter);
+                var result = Get(expression, page, pageSize, filter, includesAux);
                 return new ObjectBL(result, result.Queryable.Count());
             }
             catch
@@ -256,15 +257,16 @@ namespace GenericControllerLib.BusinessLogic
             }
         }
 
-        /// <summary>
-        /// Devuelve un listado de base de datos en función del predicado
-        /// </summary>
-        /// <param name="predicate">Predicado para filtrar</param>
-        /// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
-        /// <param name="pageSize">Nº de resultados a mostrar por página</param>
-        /// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
-        /// <returns>Listado de base de datos</returns>
-        private PagedResult<T> Get(Expression<Func<T, bool>>? predicate = null, int page = -1, int pageSize = 10, string filter = "")
+		/// <summary>
+		/// Devuelve un listado de base de datos en función del predicado
+		/// </summary>
+		/// <param name="predicate">Predicado para filtrar</param>
+		/// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
+		/// <param name="pageSize">Nº de resultados a mostrar por página</param>
+		/// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
+		/// <param name="includes">Incluye las propiedas de la entidad seguidas por comas</param>
+		/// <returns>Listado de base de datos</returns>
+		private PagedResult<T> Get(Expression<Func<T, bool>>? predicate = null, int page = -1, int pageSize = 10, string filter = "", List<string>? includes  = null)
         {
             try
             {
@@ -286,6 +288,12 @@ namespace GenericControllerLib.BusinessLogic
                     list = predicate == null ? aux : aux.Where(predicate);
                 else
                     list = predicate == null ? aux.Skip(skip).Take(pageSize) : aux.Skip(skip).Take(pageSize).Where(predicate);
+
+                // Se incluyen las entidades relacionadas
+                if (includes != null)
+                {
+                    list = Util.Include(list, includes);
+                }
 
                 return new PagedResult<T>
                 {

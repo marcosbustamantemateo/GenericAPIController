@@ -1,7 +1,7 @@
 ﻿using GenericControllerLib.BusinessLogic;
 using GenericControllerLib.Dto;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc; 
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic.Core;
 
@@ -11,7 +11,7 @@ namespace GenericControllerLib.Controllers.API
     ///     Controlador base que proporciona métodos CRUD para cualquier tipo de objeto
     /// </summary>
     /// <typeparam name="T">Entidad tipo T</typeparam>
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     [ProducesResponseType(typeof(BaseDto), 200)]
@@ -32,7 +32,7 @@ namespace GenericControllerLib.Controllers.API
         /// </summary>
         /// <param name="entity">Objeto a crear</param>
         /// <returns>Resultado de la operación</returns>
-        [Authorize(Roles = "Superadmin, Admin")]
+        //[Authorize(Roles = "Superadmin, Admin")]
         [HttpPost("Create_Generic")]
         public IActionResult Create(T entity)
         {
@@ -62,19 +62,20 @@ namespace GenericControllerLib.Controllers.API
 		/// </summary>
 		/// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
 		/// <param name="pageSize">Nº de resltados a mostrar por página</param>
-		/// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
+		/// <param name="includes">Incluye las propiedas de la entidad seguidas por comas</param>
+		/// <param name="filter">Filtra por todas y cada una de las propiedas de la entidad</param>
 		/// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
 		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
 		/// <returns>Listado de entidad dada</returns>
 		[HttpGet("Read_Generic")]
-        public ActionResult Read(int page = 1, int pageSize = 10, string filter = "", 
+        public ActionResult Read(int page = 1, int pageSize = 10, string includes = "", string filter = "", 
                                     [Required] bool includeDeleted = true, [Required] bool excludeActived = false)
         {
             try
             {
                 if (page >= 1 && pageSize >= 1)
                 {
-                    var result = _businessLogic.Read(page, pageSize, filter, includeDeleted, excludeActived);
+                    var result = _businessLogic.Read(page, pageSize, filter, includeDeleted, excludeActived, includes);
 					PagedResult<T>? pagedResultAux = result.data as PagedResult<T>;
 
                     return Ok(new BaseDto($"Objeto tipo: {typeof(T)}" +
@@ -101,7 +102,7 @@ namespace GenericControllerLib.Controllers.API
         /// </summary>
         /// <param name="entity">Objeto a actualizar</param>
         /// <returns>Resultado de la operación</returns>
-        [Authorize(Roles = "Superadmin, Admin")]
+        //[Authorize(Roles = "Superadmin, Admin")]
         [HttpPut("Update_Generic")]
         public IActionResult Update(T entity)
         {
@@ -133,7 +134,7 @@ namespace GenericControllerLib.Controllers.API
         /// <param name="id">Id de la entidad</param>
         /// <param name="saveData">Indica si en lugar de borrar el objeto solo da de baja el objeto</param>
         /// <returns>Resultado de la operación</returns>
-        [Authorize(Roles = "Superadmin, Admin")]
+        //[Authorize(Roles = "Superadmin, Admin")]
         [HttpDelete("Delete_Generic")]
         public IActionResult Delete(int id, bool saveData = true)
         {
@@ -176,7 +177,7 @@ namespace GenericControllerLib.Controllers.API
 		/// </summary>
 		/// <param name="id">Id de la entidad</param>
 		/// <returns>Resultado de la operación</returns>
-		[Authorize(Roles = "Superadmin, Admin")]
+		//[Authorize(Roles = "Superadmin, Admin")]
 		[HttpPut("Recover_Generic")]
 		public IActionResult Recover(int id)
 		{

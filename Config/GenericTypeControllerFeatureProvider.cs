@@ -6,12 +6,15 @@ using System.Reflection;
 
 namespace GenericControllerLib.Config
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
+	/// <summary>
+	///     Aplica cambios sobre los controladores 
+	/// </summary>
+	public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
     {
-        public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
+		/// <summary>
+		///     Genera controladores genéricos y sus respectivos métodos de forma dinámica
+		/// </summary>
+		public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
             var currentAssembly = typeof(GenericTypeControllerFeatureProvider).Assembly;
             var candidates = currentAssembly.GetExportedTypes().Where(x => x.GetCustomAttributes<GeneratedControllerAttribute>().Any());

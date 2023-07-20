@@ -8,7 +8,10 @@ using System.Linq.Dynamic.Core;
 
 namespace GenericControllerLib.Controllers.API
 {
-    [Route("api/[controller]")]
+	/// <summary>
+	///     Controlador base que proporciona métodos CRUD para el clase User
+	/// </summary>
+	[Route("api/[controller]")]
     [ApiController]
     [ProducesResponseType(typeof(string), 200)]
     [ProducesResponseType(typeof(BaseDto), 400)]
@@ -27,20 +30,21 @@ namespace GenericControllerLib.Controllers.API
 		/// </summary>
 		/// <param name="page">Nº de página a mostrar. Si se introduce -1 se muestran todos los resultados sin paginar</param>
 		/// <param name="pageSize">Nº de resltados a mostrar por página</param>
-		/// <param name="filter">Cadena de texto para filtrar por todas y cada una de las propiedas de la entidad</param>
-		/// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
+		/// <param name="includes">Incluye las propiedas de la entidad seguidas por comas</param>
+		/// <param name="filter">Filtra por todas y cada una de las propiedas de la entidad</param>
+        /// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
 		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
 		/// <returns>Listado de entidad dada</returns>
-		[Authorize]
-        [HttpGet("Read")]
-        public async Task<ActionResult> Read(int page = 1, int pageSize = 10, string filter = "",
+		//[Authorize]
+		[HttpGet("Read")]
+        public async Task<ActionResult> Read(int page = 1, int pageSize = 10, string? includes = "", string? filter = "",
 			                                    [Required] bool includeDeleted = true, [Required] bool excludeActived = false)
         {
             try
             {
                 if (page >= 1 || pageSize >= 1)
                 {
-                    var result = _usuarioBL.Read(page, pageSize, filter, includeDeleted, excludeActived);
+                    var result = _usuarioBL.Read(page, pageSize, filter, includeDeleted, excludeActived, includes);
                     var pagedResultAux = (PagedResult<User>?)result.data;
 
                     return Ok(new BaseDto($"Objeto tipo: {typeof(User)}" +
@@ -105,7 +109,7 @@ namespace GenericControllerLib.Controllers.API
         /// </summary>
         /// <param name="idUsuario">Id del usuario</param>
         /// <param name="idRol">Id del rol</param>
-        [Authorize(Roles = "Superadmin")]
+        //[Authorize(Roles = "Superadmin")]
         [HttpPost("AssignRole")]
         [ProducesResponseType(typeof(BaseDto), 401)]
         public IActionResult AssignRole(int idUsuario, int idRol)
@@ -134,7 +138,7 @@ namespace GenericControllerLib.Controllers.API
         /// <param name="idUsuario">Id del usuario</param>
         /// <param name="idRol">Id del rol</param>
         [ProducesResponseType(typeof(BaseDto), 401)]
-        [Authorize(Roles = "Superadmin")]
+        //[Authorize(Roles = "Superadmin")]
         [HttpDelete("DeleteRole")]
         public IActionResult DeleteRole(int idUsuario, int idRol)
         {
@@ -154,15 +158,6 @@ namespace GenericControllerLib.Controllers.API
             {
                 return StatusCode(500, new BaseDto("¡Error: No se pudo eliminar el rol del usuario!", ex.Message));
             }
-        }
-
-        /// <summary>
-        ///     Comprueba si se está autenticado
-        /// </summary>
-        [HttpGet("Check")]
-        public IActionResult Check()
-        {
-            return Ok("Api autenticada");
         }
     }
 }

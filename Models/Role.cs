@@ -3,11 +3,11 @@
 namespace GenericControllerLib.Models
 {
     /// <summary>
-    ///     Clase que implementa el rol para estandar identity de .net
+    ///     Clase que implementa el rol para el estandar de seguridad identity
     /// </summary>
     [GeneratedController]
     public class Role : IdentityRole<int>
     {
         public DateTime? DeletedDate { get; set; }
-    }
+	}
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using GenericControllerLib.Models;
 using GenericControllerLib;
@@ -83,19 +82,6 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = false;
 });
-
-//builder.Services.ConfigureApplicationCookie(options =>
-//{
-//    // Cookie settings
-//    options.Cookie.Name = "YourAppCookieName";
-//    options.Cookie.HttpOnly = true;
-//    options.ExpireTimeSpan = TimeSpan.FromDays(365);
-
-//    options.LoginPath = "/Identity/Account/Login";
-//    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-//    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
-//    options.SlidingExpiration = true;
-//});
 
 // Add services to the container.
 builder.Services

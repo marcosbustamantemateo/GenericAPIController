@@ -5,15 +5,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GenericControllerLib
 {
+    /// <summary>
+    ///     Controla el acceso a la BD cumpliendo el estandar de seguridad identity
+    /// </summary>
     public class EntitiesDbContext : IdentityDbContext<User, Role, int>
     {
         public EntitiesDbContext(DbContextOptions<EntitiesDbContext> options) : base(options) { }
 
+        /// <summary>
+        ///     Cambia las opciones del acceso a la BD
+        /// </summary>
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.EnableSensitiveDataLogging();
         }
 
+        /// <summary>
+        ///     Inserta datos a la hora de realizar el comando update-database
+        /// </summary>
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -29,8 +38,8 @@ namespace GenericControllerLib
 
             builder.Entity<User>()
                 .ToTable("T_USUARIOS")
-                .Ignore(i => i.TwoFactorEnabled)
                 .Ignore(i => i.Roles)
+                .Ignore(i => i.TwoFactorEnabled)
                 .HasData(
                     new User
                     {
