@@ -30,14 +30,6 @@ namespace GenericControllerLib.Controllers.API
 			_businessLogic = businessLogic;
 		}
 
-		[HttpPost("Test")]
-		public IActionResult Test(List<FieldDto> fieldDtos)
-		{
-
-			dynamic example = new ExpandoObject();
-			return Ok();
-		}
-
 		/// <summary>
 		///     Crea una nueva entidad
 		/// </summary>
@@ -79,8 +71,8 @@ namespace GenericControllerLib.Controllers.API
 		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
 		/// <returns>Listado de entidad dada</returns>
 		[HttpGet("Read_Generic")]
-		public ActionResult Read(int page = 1, int pageSize = 10, string includes = "", string filter = "",
-									[Required] bool includeDeleted = true, [Required] bool excludeActived = false)
+		public ActionResult Read([Required] T entidad, int page = 1, int pageSize = 10, string includes = "", string filter = "",
+							[Required] bool includeDeleted = true, [Required] bool excludeActived = false)
 		{
 			try
 			{
@@ -104,7 +96,7 @@ namespace GenericControllerLib.Controllers.API
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new BaseDto("¡Error: No se pudo listar!", ex.Message));
+				return StatusCode(500, new BaseDto("¡Error: No se pudo listar!", ex.InnerException != null ? ex.InnerException.Message : ex.Message));
 			}
 		}
 
@@ -135,7 +127,7 @@ namespace GenericControllerLib.Controllers.API
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new BaseDto($"¡No se pudo actualizar el objeto del tipo {typeof(T)}!", ex.Message));
+				return StatusCode(500, new BaseDto($"¡No se pudo actualizar el objeto del tipo {typeof(T)}!", ex.InnerException != null ? ex.InnerException.Message : ex.Message));
 			}
 		}
 

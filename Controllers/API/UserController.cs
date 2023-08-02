@@ -32,6 +32,7 @@ namespace GenericControllerLib.Controllers.API
 		/// <param name="pageSize">Nº de resltados a mostrar por página</param>
 		/// <param name="includes">Incluye las propiedas de la entidad seguidas por comas</param>
 		/// <param name="filter">Filtra por todas y cada una de las propiedas de la entidad</param>
+		/// <param name="filterType">Tipo de filtrado. 0 - None, 1 - Equal, 2 - Contains, 3 - GreatherThan, 4 - GreaterThanOrEqual, 5 - SmallerThan, 6 - SmallerThanOrEqual</param>
 		/// <param name="includeDeleted">Indica si se incluyen los elementos dados de baja</param>
 		/// <param name="excludeActived">Indica si se excluyen los elementos dados de alta</param>
 		/// <returns>Listado de entidad dada</returns>
@@ -40,7 +41,7 @@ namespace GenericControllerLib.Controllers.API
 #endif
 		[HttpGet("Read")]
 		public async Task<ActionResult> Read(int page = 1, int pageSize = 10, string? includes = "", string? filter = "",
-												[Required] bool includeDeleted = true, [Required] bool excludeActived = false)
+										[Required] bool includeDeleted = true, [Required] bool excludeActived = false)
 		{
 			try
 			{
@@ -64,7 +65,7 @@ namespace GenericControllerLib.Controllers.API
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new BaseDto("¡Error: No se pudo listar!", ex.Message));
+				return StatusCode(500, new BaseDto("¡Error: No se pudo listar!", ex.InnerException != null ? ex.InnerException.Message : ex.Message));
 			}
 		}
 
@@ -103,7 +104,7 @@ namespace GenericControllerLib.Controllers.API
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new BaseDto("¡Error: No se pudo obtener el token!", ex.Message));
+				return StatusCode(500, new BaseDto("¡Error: No se pudo obtener el token!", ex.InnerException != null ? ex.InnerException.Message : ex.Message));
 			}
 		}
 
@@ -133,7 +134,7 @@ namespace GenericControllerLib.Controllers.API
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new BaseDto("¡Error: No se pudo añadir el rol al usuario!", ex.Message));
+				return StatusCode(500, new BaseDto("¡Error: No se pudo añadir el rol al usuario!", ex.InnerException != null ? ex.InnerException.Message : ex.Message));
 			}
 		}
 
@@ -163,7 +164,7 @@ namespace GenericControllerLib.Controllers.API
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new BaseDto("¡Error: No se pudo eliminar el rol del usuario!", ex.Message));
+				return StatusCode(500, new BaseDto("¡Error: No se pudo eliminar el rol del usuario!", ex.InnerException != null ? ex.InnerException.Message : ex.Message));
 			}
 		}
 	}
